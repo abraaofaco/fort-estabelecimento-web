@@ -1,17 +1,19 @@
 import React, { useEffect } from "react";
+import { CSSProperties } from "react";
 import {
   FiAlertCircle,
   FiCheckCircle,
   FiInfo,
   FiXCircle,
 } from "react-icons/fi";
+import { AnimatedValue, ForwardedProps } from "react-spring/web";
 
-import { ToastMessage, useToast } from "../../../hooks/toast";
+import { IToastMessage, useToast } from "../../../hooks/toast";
 import { Container } from "./styles";
 
-interface ToastProps {
-  message: ToastMessage;
-  style: object;
+interface IToastProps {
+  message: IToastMessage;
+  style: AnimatedValue<ForwardedProps<CSSProperties>>;
 }
 
 const icons = {
@@ -20,7 +22,7 @@ const icons = {
   error: <FiAlertCircle size={24} />,
 };
 
-const Toast: React.FC<ToastProps> = ({ message, style }) => {
+const Toast: React.FC<IToastProps> = ({ message, style }) => {
   const { removeToast } = useToast();
 
   useEffect(() => {
