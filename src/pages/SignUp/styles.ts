@@ -37,14 +37,14 @@ export const Logo = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #138646;
+  color: var(--green700);
 
   h1 {
     margin-left: 5px;
     font-family: "Fredoka One", cursive;
 
     span {
-      color: #ff9000;
+      color: var(--orange700);
     }
   }
 `;
@@ -68,7 +68,7 @@ export const AnimationContainer = styled.div`
   }
 
   > a {
-    color: #ff9000;
+    color: var(--orange700);
     display: block;
     margin-top: 24px;
     text-decoration: none;

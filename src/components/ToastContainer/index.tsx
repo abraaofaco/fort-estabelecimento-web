@@ -22,7 +22,11 @@ const ToastContainer: React.FC<IToastContainerProps> = ({ messages }) => {
   );
 
   return (
-    <Container>
+    <Container
+      style={{
+        display: messagesWithTransitions.length === 0 ? "none" : "block",
+      }}
+    >
       {messagesWithTransitions.map(({ item, key, props }) => (
         <Toast key={key} style={props} message={item} />
       ))}
