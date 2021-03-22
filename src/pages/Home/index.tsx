@@ -10,6 +10,7 @@ import {
   IResponseEstablishment,
 } from "../../components/EstablishmentAddressModal";
 import MasterPage from "../../components/MasterPage";
+import { useToast } from "../../hooks/toast";
 import api from "../../services/api";
 
 import {
@@ -25,6 +26,8 @@ const Home: React.FC = () => {
   const [establishments, setEstablishments] = useState<
     IResponseEstablishment[]
   >([]);
+
+  const { addToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -60,6 +63,34 @@ const Home: React.FC = () => {
     [establishments]
   );
 
+  const handleDeleteAddress = useCallback(
+    async (addressId: string) => {
+      try {
+        await api.delete(`/establishments/${addressId}`);
+
+        const newEstablishments = establishments
+          .map((establishment) => {
+            const addresses = establishment.addresses.filter(
+              (a) => a.id !== addressId
+            );
+
+            return Object.assign(establishment, { addresses });
+          })
+          .filter((f) => f.addresses.length > 0);
+
+        setEstablishments(newEstablishments);
+      } catch (error) {
+        addToast({
+          type: "error",
+          title: "Erro no cadastro",
+          description:
+            "Ocorreu um erro ao remover o endereço, tente novamente.",
+        });
+      }
+    },
+    [establishments, addToast]
+  );
+
   return (
     <MasterPage>
       <Container>
@@ -79,17 +110,20 @@ const Home: React.FC = () => {
               </Establishment>
               {establishment.addresses
                 .sort((a, b) => a.address.localeCompare(b.address))
-                .map((addresse) => (
-                  <Address key={addresse.id}>
+                .map((address) => (
+                  <Address key={address.id}>
                     <InfoAddress>
-                      <span>{`${addresse.address}, ${addresse.number}, ${addresse.district}`}</span>
-                      <span>{`${addresse.city}, ${addresse.state}/${addresse.country}`}</span>
+                      <span>{`${address.address}, ${address.number}, ${address.district}`}</span>
+                      <span>{`${address.city}, ${address.state}/${address.country}`}</span>
                     </InfoAddress>
                     <ActionsAddress>
                       <button type="button">
                         <RiEditBoxFill size={25} />
                       </button>
-                      <button type="button">
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteAddress(address.id)}
+                      >
                         <IoTrashBin size={25} />
                       </button>
                     </ActionsAddress>
