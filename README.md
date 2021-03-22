@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  <a href="https://github.com/EliasGcf/gobarber/blob/master/README.md"><img alt="GitHub" src="https://img.shields.io/github/license/EliasGcf/gobarber?color=%23FF9000"></a>
+ <img alt="License" src="https://img.shields.io/badge/license-MIT-%2304D361">
 </p>
 
 ## 🔗 Dependências
