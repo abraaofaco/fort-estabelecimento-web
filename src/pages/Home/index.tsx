@@ -24,6 +24,7 @@ import {
   ActionsAddress,
   NoRegistry,
 } from "./styles";
+import SearchEstablishmentAddressModal from "../../components/SearchEstablishmentAddressModal";
 
 const Home: React.FC = () => {
   const [establishments, setEstablishments] = useState<
@@ -31,7 +32,17 @@ const Home: React.FC = () => {
   >([]);
 
   const { addToast } = useToast();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [
+    searchEstablishmentAddressModalOpen,
+    setSearchEstablishmentAddressModalOpen,
+  ] = useState(false);
+
+  const [
+    establishmentAddressModalOpen,
+    setEstablishmentAddressModalOpen,
+  ] = useState(false);
+
   const [
     selectAddress,
     setSelectAddress,
@@ -163,7 +174,7 @@ const Home: React.FC = () => {
 
       setEstablishments(newEstablishments);
       setSelectAddress(null);
-      setIsModalOpen(false);
+      setEstablishmentAddressModalOpen(false);
     },
     [selectAddress, newStateUpdateAddress, newStateInsertAddress]
   );
@@ -171,7 +182,7 @@ const Home: React.FC = () => {
   const handleUpdateAddress = useCallback(
     (data: IEstablishmentAddressFormData) => {
       setSelectAddress(data);
-      setIsModalOpen(true);
+      setEstablishmentAddressModalOpen(true);
     },
     []
   );
@@ -209,9 +220,20 @@ const Home: React.FC = () => {
       <Container>
         <Header>
           <h2>Estabelecimentos</h2>
-          <Button type="button" onClick={() => setIsModalOpen(true)}>
-            Cadastrar
-          </Button>
+          <div>
+            <Button
+              type="button"
+              onClick={() => setEstablishmentAddressModalOpen(true)}
+            >
+              Cadastrar
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setSearchEstablishmentAddressModalOpen(true)}
+            >
+              Pesquisar
+            </Button>
+          </div>
         </Header>
 
         {establishments.length === 0 && (
@@ -265,13 +287,19 @@ const Home: React.FC = () => {
           ))}
       </Container>
       <EstablishmentAddressModal
-        isOpen={isModalOpen}
+        isOpen={establishmentAddressModalOpen}
         onRequestClose={() => {
           setSelectAddress(null);
-          setIsModalOpen(false);
+          setEstablishmentAddressModalOpen(false);
         }}
         onSaveCallback={handleCallbackSaveAddress}
         formData={selectAddress}
+      />
+      <SearchEstablishmentAddressModal
+        isOpen={searchEstablishmentAddressModalOpen}
+        onRequestClose={() => {
+          setSearchEstablishmentAddressModalOpen(false);
+        }}
       />
     </MasterPage>
   );

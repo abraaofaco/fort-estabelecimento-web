@@ -2,6 +2,7 @@ import { FormHandles } from "@unform/core";
 import { Form } from "@unform/web";
 import { AxiosResponse } from "axios";
 import React, { useCallback, useRef } from "react";
+import { AiOutlineClose } from "react-icons/ai";
 import Modal from "react-modal";
 import * as Yup from "yup";
 import { useToast } from "../../hooks/toast";
@@ -109,13 +110,17 @@ const EstablishmentAddressModal: React.FC<IEstablishmentAddressModalProps> = ({
       className="react-modal-content"
     >
       <Container>
+        <button type="button" onClick={onRequestClose}>
+          <AiOutlineClose />
+        </button>
+
+        <h2>Informe os dados</h2>
+
         <Form
           initialData={{ ...formData }}
           ref={formRef}
           onSubmit={handleSubmit}
         >
-          <h2>Informe os dados</h2>
-
           <Input name="name" placeholder="Estabelecimento" />
 
           <GroupH>

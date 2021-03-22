@@ -15,6 +15,10 @@ export const Header = styled.div`
     width: unset;
     height: 40px;
     background: var(--green800);
+
+    & + button {
+      margin-left: 8px;
+    }
   }
 `;
 
