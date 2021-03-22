@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import Modal from "react-modal";
+import { DebounceInput } from "react-debounce-input";
 import { AiOutlineClose } from "react-icons/ai";
-
 import { useState } from "react";
 import { Container, Establishment, Address, NoRegistry } from "./styles";
 import api from "../../services/api";
@@ -39,8 +39,7 @@ const SearchEstablishmentAddressModal: React.FC<IEstablishmentAddressModalProps>
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    // TODO: Incluir debounce depois
-    if (searchQuery.length > 0)
+    if (searchQuery.length > 0) {
       api
         .get("/establishments/search", {
           params: {
@@ -50,26 +49,32 @@ const SearchEstablishmentAddressModal: React.FC<IEstablishmentAddressModalProps>
         .then((response) => {
           setEstablishments(response.data);
         });
+    }
   }, [searchQuery]);
+
+  const handleRequestClose = useCallback(() => {
+    setSearchQuery("");
+    onRequestClose();
+  }, [setSearchQuery, onRequestClose]);
 
   return (
     <Modal
       isOpen={isOpen}
-      onRequestClose={onRequestClose}
+      onRequestClose={handleRequestClose}
       overlayClassName="react-modal-overlay"
       className="react-modal-content"
     >
       <Container>
-        <button type="button" onClick={onRequestClose}>
+        <button type="button" onClick={handleRequestClose}>
           <AiOutlineClose />
         </button>
         <h2>Pesquisar</h2>
-        <input
-          type="text"
+        <DebounceInput
+          minLength={2}
+          debounceTimeout={300}
           onChange={(e) => {
             setSearchQuery(e.target.value);
           }}
-          value={searchQuery}
           placeholder="Informe o endereço"
         />
         {establishments.length === 0 && searchQuery.length > 0 && (
