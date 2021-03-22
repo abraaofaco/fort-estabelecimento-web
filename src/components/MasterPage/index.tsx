@@ -1,14 +1,14 @@
 import React from "react";
 import Header from "../Header";
 
-import { Container } from "./styles";
+import { Container, Body } from "./styles";
 
 const MasterPage: React.FC = ({ children }) => {
   return (
-    <>
+    <Container>
       <Header />
-      <Container>{children}</Container>
-    </>
+      <Body>{children}</Body>
+    </Container>
   );
 };
 

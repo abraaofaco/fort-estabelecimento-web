@@ -1,8 +1,20 @@
 import styled from "styled-components";
 
-export const Container = styled.div`
-  > h2 {
-    color: #ff9000;
+export const Container = styled.div``;
+
+export const Header = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h2 {
+    color: var(--orange700);
+  }
+
+  button {
+    width: unset;
+    height: 40px;
+    background: var(--green800);
   }
 `;
 
@@ -15,30 +27,38 @@ export const Establishment = styled.div`
   font-weight: bold;
 `;
 
-export const Addresse = styled.div`
+export const Address = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid var(--grey500);
   border-radius: 10px;
   padding: 10px 5px;
   margin-top: 10px;
 `;
 
-export const InfoAddresse = styled.div`
+export const InfoAddress = styled.div`
   display: flex;
   flex-direction: column;
-  color: #999;
+  color: var(--grey700);
 `;
 
-export const ActionsAddresse = styled.div`
+export const ActionsAddress = styled.div`
   button {
     background: none;
     border: none;
 
+    svg {
+      color: var(--blue700);
+    }
+
     & + button {
       margin-left: 10px;
+
+      svg {
+        color: var(--red700);
+      }
     }
   }
 `;

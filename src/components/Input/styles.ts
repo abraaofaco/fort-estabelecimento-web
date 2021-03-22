@@ -1,5 +1,4 @@
 import styled, { css } from "styled-components";
-
 import Tooltip from "../Tooltip";
 
 interface ContainerProps {
@@ -9,48 +8,44 @@ interface ContainerProps {
 }
 
 export const Container = styled.div<ContainerProps>`
-  background: #d5f8e7;
+  background: var(--green200);
   border-radius: 10px;
   padding: 16px;
   width: 100%;
-
-  border: 2px solid #d5f8e7;
-  color: #6ea06f;
-
+  border: 2px solid var(--green200);
+  color: var(--green500);
   display: flex;
   align-items: center;
-
-  & + div {
-    margin-top: 8px;
-  }
+  margin-top: 8px;
 
   ${(props) =>
     props.isErrored &&
     css`
-      border-color: #c53030;
+      border-color: var(--red700);
     `}
 
   ${(props) =>
     props.isFocused &&
     css`
-      color: #ff9000;
-      border-color: #ff9000;
+      color: var(--orange700);
+      border-color: var(--orange700);
     `}
 
   ${(props) =>
     props.isFilled &&
     css`
-      color: #ff9000;
+      color: var(--orange700);
     `}
 
   input {
     flex: 1;
     background: transparent;
     border: 0;
-    color: #6ea06f;
+    color: var(--green500);
+    overflow: hidden;
 
     &::placeholder {
-      color: #6ea06f;
+      color: var(--green500);
     }
   }
 
@@ -65,14 +60,15 @@ export const Error = styled(Tooltip)`
 
   svg {
     margin: 0;
+    color: var(--red700);
   }
 
   span {
-    background: #c53030;
-    color: #fff;
+    background: var(--red700);
+    color: var(--white);
 
     &::before {
-      border-color: #c53030 transparent;
+      border-color: var(--red700) transparent;
     }
   }
 `;
