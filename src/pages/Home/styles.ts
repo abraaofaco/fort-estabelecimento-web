@@ -18,6 +18,19 @@ export const Header = styled.div`
   }
 `;
 
+export const NoRegistry = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 150px;
+  color: var(--grey500);
+
+  svg {
+    font-size: 150px;
+  }
+`;
+
 export const Establishment = styled.div`
   display: flex;
   flex: row;

@@ -1,6 +1,6 @@
 import { FormHandles } from "@unform/core";
 import { Form } from "@unform/web";
-import { margin } from "polished";
+import { AxiosResponse } from "axios";
 import React, { useCallback, useRef } from "react";
 import Modal from "react-modal";
 import * as Yup from "yup";
@@ -14,12 +14,15 @@ import { Container, GroupH } from "./styles";
 
 interface IEstablishmentAddressModalProps {
   isOpen: boolean;
+  formData?: IEstablishmentAddressFormData | null;
   onRequestClose: () => void;
   onSaveCallback: (data: IResponseEstablishment) => void;
 }
 
 interface IEstablishmentAddressFormData {
+  id: string;
   name: string;
+  establishmentId: string;
   address: string;
   number: string;
   district: string;
@@ -47,6 +50,7 @@ interface IResponseEstablishment {
 
 const EstablishmentAddressModal: React.FC<IEstablishmentAddressModalProps> = ({
   isOpen,
+  formData,
   onRequestClose,
   onSaveCallback,
 }) => {
@@ -72,7 +76,12 @@ const EstablishmentAddressModal: React.FC<IEstablishmentAddressModalProps> = ({
           abortEarly: false,
         });
 
-        const result = await api.post("/establishments", data);
+        let result: AxiosResponse;
+        if (formData) {
+          result = await api.put(`/establishments/${formData.id}`, data);
+        } else {
+          result = await api.post("/establishments", data);
+        }
 
         onSaveCallback(result.data);
       } catch (err) {
@@ -89,7 +98,7 @@ const EstablishmentAddressModal: React.FC<IEstablishmentAddressModalProps> = ({
         });
       }
     },
-    [addToast, onSaveCallback]
+    [addToast, onSaveCallback, formData]
   );
 
   return (
@@ -100,7 +109,11 @@ const EstablishmentAddressModal: React.FC<IEstablishmentAddressModalProps> = ({
       className="react-modal-content"
     >
       <Container>
-        <Form ref={formRef} onSubmit={handleSubmit}>
+        <Form
+          initialData={{ ...formData }}
+          ref={formRef}
+          onSubmit={handleSubmit}
+        >
           <h2>Informe os dados</h2>
 
           <Input name="name" placeholder="Estabelecimento" />
@@ -140,4 +153,4 @@ const EstablishmentAddressModal: React.FC<IEstablishmentAddressModalProps> = ({
 };
 
 export { EstablishmentAddressModal };
-export type { IResponseEstablishment };
+export type { IResponseEstablishment, IEstablishmentAddressFormData };

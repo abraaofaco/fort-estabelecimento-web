@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { IoTrashBin } from "react-icons/io5";
 import { RiEditBoxFill } from "react-icons/ri";
+import { FaRegSadTear } from "react-icons/fa";
 import Button from "../../components/Button";
 import {
   EstablishmentAddressModal,
+  IEstablishmentAddressFormData,
   IResponseEstablishment,
 } from "../../components/EstablishmentAddressModal";
 import MasterPage from "../../components/MasterPage";
@@ -20,6 +22,7 @@ import {
   Address,
   InfoAddress,
   ActionsAddress,
+  NoRegistry,
 } from "./styles";
 
 const Home: React.FC = () => {
@@ -29,6 +32,10 @@ const Home: React.FC = () => {
 
   const { addToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [
+    selectAddress,
+    setSelectAddress,
+  ] = useState<IEstablishmentAddressFormData | null>(null);
 
   useEffect(() => {
     api.get("/establishments").then((response) => {
@@ -36,31 +43,137 @@ const Home: React.FC = () => {
     });
   }, []);
 
-  const handleCallbackSaveAddress = useCallback(
+  const newStateInsertAddress = useCallback(
     (data: IResponseEstablishment) => {
       let newEstablishments: IResponseEstablishment[];
 
       const findEstablishment = establishments.find((f) => f.id === data.id);
-      if (findEstablishment) {
+      if (!findEstablishment) {
+        newEstablishments = [data, ...establishments];
+      } else {
         newEstablishments = establishments.map((establishment) =>
           establishment.id !== findEstablishment.id
             ? establishment
-            : Object.assign(establishment, {
+            : {
+                ...establishment,
                 addresses: [...data.addresses, ...establishment.addresses],
-              })
+              }
         );
-      } else {
-        newEstablishments = [data, ...establishments];
       }
+
+      return newEstablishments;
+    },
+    [establishments]
+  );
+
+  const changeAddressOnly = useCallback(
+    (data: IResponseEstablishment): IResponseEstablishment[] => {
+      const newEstablishments = establishments.map((establishment) => {
+        if (establishment.id !== selectAddress?.establishmentId)
+          return establishment;
+
+        const addresses = establishment.addresses.map((address) =>
+          address.id === selectAddress.id ? data.addresses[0] : address
+        );
+
+        return { ...establishment, addresses };
+      });
+
+      return newEstablishments;
+    },
+    [establishments, selectAddress]
+  );
+
+  const changeWithMovingExistingEstablishment = useCallback(
+    (data: IResponseEstablishment): IResponseEstablishment[] => {
+      const newEstablishments = establishments.map((establishment) => {
+        if (establishment.id === data.id) {
+          return {
+            ...establishment,
+            addresses: [...data.addresses, ...establishment.addresses],
+          };
+        }
+
+        if (establishment.id === selectAddress?.establishmentId) {
+          const addresses = establishment.addresses.filter(
+            (f) => f.id !== selectAddress.id
+          );
+
+          return { ...establishment, addresses };
+        }
+
+        return establishment;
+      });
+
+      return newEstablishments;
+    },
+    [establishments, selectAddress]
+  );
+
+  const changeAdressWithRegistrationEstablishment = useCallback(
+    (data: IResponseEstablishment): IResponseEstablishment[] => {
+      const newEstablishments = establishments.map((establishment) => {
+        if (establishment.id === selectAddress?.establishmentId) {
+          const addresses = establishment.addresses.filter(
+            (f) => f.id !== selectAddress.id
+          );
+
+          return { ...establishment, addresses };
+        }
+
+        return establishment;
+      });
+
+      return [...newEstablishments, data];
+    },
+    [establishments, selectAddress]
+  );
+
+  const newStateUpdateAddress = useCallback(
+    (data: IResponseEstablishment): IResponseEstablishment[] => {
+      if (data.id === selectAddress?.establishmentId)
+        return changeAddressOnly(data);
+
+      const findEstablishment = establishments.find(
+        (establishment) => establishment.id === data.id
+      );
+
+      if (findEstablishment) return changeWithMovingExistingEstablishment(data);
+
+      return changeAdressWithRegistrationEstablishment(data);
+    },
+    [
+      establishments,
+      selectAddress,
+      changeAddressOnly,
+      changeWithMovingExistingEstablishment,
+      changeAdressWithRegistrationEstablishment,
+    ]
+  );
+
+  const handleCallbackSaveAddress = useCallback(
+    (data: IResponseEstablishment) => {
+      let newEstablishments: IResponseEstablishment[] = selectAddress
+        ? newStateUpdateAddress(data)
+        : newStateInsertAddress(data);
 
       newEstablishments = newEstablishments.filter(
         (f) => f.addresses.length > 0
       );
 
       setEstablishments(newEstablishments);
+      setSelectAddress(null);
       setIsModalOpen(false);
     },
-    [establishments]
+    [selectAddress, newStateUpdateAddress, newStateInsertAddress]
+  );
+
+  const handleUpdateAddress = useCallback(
+    (data: IEstablishmentAddressFormData) => {
+      setSelectAddress(data);
+      setIsModalOpen(true);
+    },
+    []
   );
 
   const handleDeleteAddress = useCallback(
@@ -101,6 +214,13 @@ const Home: React.FC = () => {
           </Button>
         </Header>
 
+        {establishments.length === 0 && (
+          <NoRegistry>
+            <FaRegSadTear />
+            <h1>Sem Registro</h1>
+          </NoRegistry>
+        )}
+
         {establishments
           .sort((a, b) => a.name.localeCompare(b.name))
           .map((establishment) => (
@@ -113,11 +233,23 @@ const Home: React.FC = () => {
                 .map((address) => (
                   <Address key={address.id}>
                     <InfoAddress>
-                      <span>{`${address.address}, ${address.number}, ${address.district}`}</span>
-                      <span>{`${address.city}, ${address.state}/${address.country}`}</span>
+                      <span>
+                        {`${address.address}, ${address.number || "s/n"}, ${
+                          address.district
+                        }, ${address.city}`}
+                      </span>
+                      <span>{`${address.state}/${address.country}`}</span>
                     </InfoAddress>
                     <ActionsAddress>
-                      <button type="button">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleUpdateAddress({
+                            name: establishment.name,
+                            ...address,
+                          })
+                        }
+                      >
                         <RiEditBoxFill size={25} />
                       </button>
                       <button
@@ -134,8 +266,12 @@ const Home: React.FC = () => {
       </Container>
       <EstablishmentAddressModal
         isOpen={isModalOpen}
-        onRequestClose={() => setIsModalOpen(false)}
+        onRequestClose={() => {
+          setSelectAddress(null);
+          setIsModalOpen(false);
+        }}
         onSaveCallback={handleCallbackSaveAddress}
+        formData={selectAddress}
       />
     </MasterPage>
   );
